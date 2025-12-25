@@ -16,15 +16,15 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
+	// Use DATABASE_URL environment variable (Render sets this manually)
 	dsn := os.Getenv("DB_URL")
 	if dsn == "" {
 		log.Fatal("DB_URL environment variable is not set")
 	}
 
-	// Configure logger based on environment
+	// Configure logger: verbose only in local development
 	var gormLogger logger.Interface
 	if os.Getenv("ENV") == "development" && os.Getenv("DEBUG_DB") == "true" {
-		// Only enable verbose logging when explicitly requested
 		gormLogger = logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
 			logger.Config{
@@ -35,14 +35,13 @@ func ConnectDB() {
 			},
 		)
 	} else {
-		// Production or normal dev: only warn on errors/slow queries
 		gormLogger = logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
 			logger.Config{
-				SlowThreshold:             1 * time.Second, // Higher threshold to reduce noise
+				SlowThreshold:             1 * time.Second,
 				LogLevel:                  logger.Warn,
 				IgnoreRecordNotFoundError: true,
-				Colorful:                  false, // Less overhead
+				Colorful:                  false,
 			},
 		)
 	}
@@ -54,27 +53,27 @@ func ConnectDB() {
 		log.Fatal("Failed to connect to database!", err)
 	}
 
-	// Connection pool settings
+	// Connection pool
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatal("Failed to get database instance", err)
+		log.Fatal("Failed to get DB instance", err)
 	}
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 
-	fmt.Println("Connected to database")
+	fmt.Println("✅ Connected to database")
 
 	DB = db
-	
-	// Auto-migrate only in development (remove in production)
+
+	// Auto-migrate only in development
 	if os.Getenv("ENV") == "development" {
 		err = DB.AutoMigrate(&model.User{}, &model.Card{})
 		if err != nil {
 			log.Fatal("Failed to auto-migrate models!", err)
 		}
-		fmt.Println("Database auto-migration completed")
+		fmt.Println("✅ Database auto-migration completed")
 	} else {
 		fmt.Println("Skipping auto-migration in production")
 	}
