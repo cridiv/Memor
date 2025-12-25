@@ -1,0 +1,60 @@
+# Root .gitignore for Memor (Go backend + Next.js frontend)
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.orig
+.vscode/
+.idea/
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Environment files (keep examples) ---
+# Root
+.env
+.env.*
+!/.env.example
+# Any subfolder (backend/frontend)
+**/.env
+**/.env.*
+!**/.env.example
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+.vercel/
+# TypeScript incremental build info
+*.tsbuildinfo
+# Common build output
+Dist/
+dist/
+
+# --- Go ---
+# Binaries and artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+# Build output folders
+bin/
+# Keep go.mod and go.sum tracked (do NOT ignore)
+
+# --- Coverage ---
+coverage/
+
+# --- Temporary / Backup files ---
+*~
+*.tmp
+*.temp
